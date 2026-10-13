@@ -1,0 +1,35 @@
+package me.rerere.rikkahub.data.db.migrations
+
+import android.util.Log
+import androidx.room.migration.Migration
+import androidx.sqlite.SQLiteConnection
+import me.rerere.rikkahub.data.db.DatabaseMigrationTracker
+
+private const val TAG = "Migration_13_14"
+
+val Migration_13_14 = object : Migration(13, 14) {
+    override fun migrate(db: SQLiteConnection) {
+        Log.i(TAG, "migrate: start migrate from 13 to 14 (UIMessagePart type -> @SerialName)")
+        DatabaseMigrationTracker.onMigrationStart(13, 14)
+        try {
+            val cursor = db.query("SELECT id, messages FROM message_node")
+            var updatedCount = 0
+            while (cursor.moveToNext()) {
+                val id = cursor.getString(0)
+                val messagesJson = cursor.getString(1)
+                val migratedJson = migrateMessagesJson(messagesJson)
+                if (migratedJson != messagesJson) {
+                    db.execSQL(
+                        "UPDATE message_node SET messages = ? WHERE id = ?",
+                        arrayOf(migratedJson, id)
+                    )
+                    updatedCount++
+                }
+            }
+            cursor.close()
+            Log.i(TAG, "migrate: migrate from 13 to 14 success ($updatedCount nodes updated)")
+        } finally {
+            DatabaseMigrationTracker.onMigrationEnd()
+        }
+    }
+}

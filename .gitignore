@@ -1,13 +1,16 @@
+# Gradle
+.gradle/
+build/
+*/build/
+!gradle/wrapper/gradle-wrapper.jar
+
+# IDE
+.idea/
 *.iml
-.gradle
-/local.properties
-/.idea
+.kotlin/
+
+# OS
 .DS_Store
-/build
-/captures
-.externalNativeBuild
-.cxx
-local.properties
-.cursor
-.history
-.kotlin
+
+# Android-only modules are kept for reference; their build output is ignored
+app/build/

@@ -1,36 +1,55 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 plugins {
-    id("rikkahub.android.library.compose")
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.compose.multiplatform)
 }
 
-android {
-    namespace = "me.rerere.ui"
+kotlin {
+    compilerOptions {
+        jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21
+        freeCompilerArgs.addAll(
+            "-opt-in=androidx.compose.material3.ExperimentalMaterial3Api",
+            "-opt-in=androidx.compose.material3.ExperimentalMaterial3ExpressiveApi",
+            "-opt-in=androidx.compose.foundation.ExperimentalFoundationApi",
+            "-opt-in=androidx.compose.foundation.layout.ExperimentalLayoutApi",
+            "-opt-in=androidx.compose.animation.ExperimentalAnimationApi",
+            "-opt-in=androidx.compose.ui.ExperimentalComposeUiApi",
+            "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
+            "-opt-in=kotlinx.serialization.ExperimentalSerializationApi",
+            "-opt-in=kotlin.ExperimentalStdlibApi",
+            "-opt-in=kotlin.uuid.ExperimentalUuidApi",
+            "-Xjvm-default=all"
+        )
+    }
 }
 
-tasks.withType<KotlinCompile>().configureEach {
-    compilerOptions.optIn.add("androidx.compose.material3.ExperimentalMaterial3Api")
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
 }
 
 dependencies {
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.exifinterface)
-    implementation(libs.androidx.ink.authoring.compose)
-    implementation(libs.androidx.ink.brush)
-    implementation(libs.androidx.ink.geometry)
-    implementation(libs.androidx.ink.rendering)
-    implementation(libs.androidx.ink.strokes)
-    implementation(libs.androidx.activity.compose)
-    implementation(platform(libs.androidx.compose.bom))
-    implementation(libs.androidx.ui)
-    implementation(libs.androidx.ui.graphics)
-    implementation(libs.androidx.ui.tooling.preview)
-    implementation(libs.androidx.material3)
-    implementation(libs.huge.icons)
-    implementation(libs.jetbrains.markdown)
-    implementation(libs.jsoup)
-    implementation(libs.kotlinx.coroutines.core)
-    implementation(libs.kotlinx.serialization.json)
-
-    testImplementation(libs.junit)
+    api(project(":platform"))
+    api(project(":hugeicons"))
+    api(project(":common"))
+    api(libs.lucide.icons)
+    api(libs.jsoup)
+    api(libs.jetbrains.markdown)
+    api(libs.kotlinx.coroutines.core)
+    api(libs.kotlinx.serialization.json)
+    api(libs.haze)
+    api(libs.haze.blur)
+    api(libs.haze.blur.material3)
+    api(libs.haze.glass)
+    api(libs.haze.glass.material3)
+    api(libs.reorderable)
+    api(libs.sonner)
+    api(compose.runtime)
+    api(compose.foundation)
+    api(compose.material3)
+    api(compose.ui)
+    api(compose.animation)
+    implementation(libs.slf4j.api)
+    implementation(libs.org.json)
 }

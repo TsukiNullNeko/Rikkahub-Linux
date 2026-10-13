@@ -1,11 +1,17 @@
-// Top-level build file where you can add configuration options common to all sub-projects/modules.
+// RikkaHub-Linux root build file
 plugins {
-    alias(libs.plugins.android.application) apply false
+    alias(libs.plugins.kotlin.jvm) apply false
     alias(libs.plugins.kotlin.compose) apply false
-    alias(libs.plugins.android.library) apply false
+    alias(libs.plugins.kotlin.serialization) apply false
+    alias(libs.plugins.compose.multiplatform) apply false
     alias(libs.plugins.ksp) apply false
-    alias(libs.plugins.google.services) apply false
-    alias(libs.plugins.firebase.crashlytics) apply false
-    alias(libs.plugins.android.test) apply false
-    alias(libs.plugins.baselineprofile) apply false
+}
+// Compose Multiplatform's plugin maps compose.material3 to the stable 1.9.0 line, which lacks
+// the Material 3 Expressive APIs this app relies on. Force the expressive line explicitly.
+subprojects {
+    configurations.configureEach {
+        resolutionStrategy {
+            force("org.jetbrains.compose.material3:material3:1.13.0-alpha02")
+        }
+    }
 }

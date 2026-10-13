@@ -1,17 +1,6 @@
 package me.rerere.tts.controller
 
 import android.content.Context
-import android.net.Uri
-import androidx.annotation.OptIn
-import androidx.media3.common.MediaItem
-import androidx.media3.common.PlaybackException
-import androidx.media3.common.PlaybackParameters
-import androidx.media3.common.Player
-import androidx.media3.common.util.UnstableApi
-import androidx.media3.datasource.ByteArrayDataSource
-import androidx.media3.datasource.DataSource
-import androidx.media3.exoplayer.ExoPlayer
-import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -27,121 +16,170 @@ import me.rerere.tts.model.AudioFormat
 import me.rerere.tts.model.PlaybackState
 import me.rerere.tts.model.PlaybackStatus
 import me.rerere.tts.model.TTSResponse
+import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
+import javax.sound.sampled.AudioSystem
+import javax.sound.sampled.DataLine
+import javax.sound.sampled.SourceDataLine
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
+/**
+ * Desktop audio player for TTS responses.
+ *
+ * Android's media3/ExoPlayer is replaced with javax.sound.sampled; MP3/OGG decoding is
+ * provided by the soundlibs SPI codecs on the classpath.
+ */
 class AudioPlayer(context: Context) {
-    private val player = ExoPlayer.Builder(context).build()
-    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     private val _playbackState = MutableStateFlow(PlaybackState())
     val playbackState: StateFlow<PlaybackState> = _playbackState.asStateFlow()
 
+    private var playJob: Job? = null
     private var positionJob: Job? = null
+    private var line: SourceDataLine? = null
+    private var paused = false
+    private var speed = 1.0f
+    private var durationMs = 0L
+    private var positionMs = 0L
 
-    fun pause() = player.pause()
-    fun resume() = player.play()
-    fun stop() = player.stop()
-    fun clear() = player.clearMediaItems()
-    fun release() = player.release()
-    fun seekBy(ms: Long) = player.seekTo(player.currentPosition + ms)
-    fun setSpeed(speed: Float) {
-        player.playbackParameters = PlaybackParameters(speed)
-        _playbackState.update { it.copy(speed = speed) }
+    fun pause() {
+        paused = true
+        runCatching { line?.stop() }
+        _playbackState.update { it.copy(status = PlaybackStatus.Paused) }
     }
 
-    @OptIn(UnstableApi::class)
+    fun resume() {
+        paused = false
+        runCatching { line?.start() }
+        _playbackState.update { it.copy(status = PlaybackStatus.Playing) }
+    }
+
+    fun stop() {
+        playJob?.cancel()
+        positionJob?.cancel()
+        runCatching {
+            line?.stop()
+            line?.flush()
+            line?.close()
+        }
+        line = null
+        _playbackState.update { it.copy(status = PlaybackStatus.Idle, positionMs = 0L) }
+    }
+
+    fun clear() {
+        stop()
+    }
+
+    fun release() {
+        stop()
+    }
+
+    fun seekBy(ms: Long) {
+        positionMs = (positionMs + ms).coerceIn(0L, durationMs)
+        _playbackState.update { it.copy(positionMs = positionMs) }
+    }
+
+    fun setSpeed(speed: Float) {
+        this.speed = speed.coerceIn(0.25f, 4f)
+        _playbackState.update { it.copy(speed = this.speed) }
+    }
+
     suspend fun play(response: TTSResponse) = suspendCancellableCoroutine<Unit> { cont ->
+        stop()
+
         val bytes = if (response.format == AudioFormat.PCM) {
             pcmToWav(response.audioData, response.sampleRate ?: 24000)
-        } else response.audioData
-
-        val dataSourceFactory = DataSource.Factory { ByteArrayDataSource(bytes) }
-        val mediaSource = ProgressiveMediaSource.Factory(dataSourceFactory)
-            .createMediaSource(MediaItem.fromUri(Uri.EMPTY))
-
-        player.setMediaSource(mediaSource)
-        player.prepare()
-        player.play()
+        } else {
+            response.audioData
+        }
 
         _playbackState.update {
             it.copy(
                 status = PlaybackStatus.Buffering,
                 positionMs = 0L,
-                durationMs = (response.duration?.times(1000))?.toLong() ?: it.durationMs
+                durationMs = (response.duration?.times(1000))?.toLong() ?: it.durationMs,
+                speed = speed
             )
         }
 
-        val listener = object : Player.Listener {
-            override fun onPlaybackStateChanged(state: Int) {
-                when (state) {
-                    Player.STATE_BUFFERING -> {
-                        _playbackState.update { it.copy(status = PlaybackStatus.Buffering) }
-                        stopPositionUpdates()
-                    }
-                    Player.STATE_READY -> {
-                        val isPlaying = player.isPlaying
-                        val duration = if (player.duration > 0) player.duration else playbackState.value.durationMs
-                        _playbackState.update {
-                            it.copy(
-                                status = if (isPlaying) PlaybackStatus.Playing else PlaybackStatus.Paused,
-                                durationMs = duration,
-                                positionMs = player.currentPosition
-                            )
-                        }
-                        if (isPlaying) startPositionUpdates() else stopPositionUpdates()
-                    }
-                    Player.STATE_ENDED -> {
-                        stopPositionUpdates()
-                        _playbackState.update {
-                            it.copy(
-                                status = PlaybackStatus.Ended,
-                                positionMs = player.duration.coerceAtLeast(it.positionMs),
-                                durationMs = if (player.duration > 0) player.duration else it.durationMs
-                            )
-                        }
-                        player.removeListener(this)
-                        if (cont.isActive) cont.resume(Unit)
-                    }
-                    Player.STATE_IDLE -> {
-                        stopPositionUpdates()
-                        _playbackState.update { it.copy(status = PlaybackStatus.Idle) }
-                    }
+        playJob = scope.launch {
+            try {
+                val stream = AudioSystem.getAudioInputStream(ByteArrayInputStream(bytes))
+                val format = stream.format
+                val info = DataLine.Info(SourceDataLine::class.java, format)
+                val output = AudioSystem.getLine(info) as SourceDataLine
+                output.open(format, 32 * 1024)
+                output.start()
+                line = output
+
+                val frameSize = format.frameSize.coerceAtLeast(1)
+                val frameRate = format.frameRate
+                val totalFrames = stream.frameLength
+                durationMs = if (frameRate > 0 && totalFrames > 0) (totalFrames / frameRate * 1000).toLong() else durationMs
+
+                _playbackState.update {
+                    it.copy(
+                        status = PlaybackStatus.Playing,
+                        durationMs = durationMs,
+                        positionMs = 0L
+                    )
                 }
-            }
+                startPositionUpdates()
 
-            override fun onPlayerError(error: PlaybackException) {
-                player.removeListener(this)
+                val buffer = ByteArray(8192)
+                var framesPlayed = 0L
+                var read = stream.read(buffer)
+                while (read > 0) {
+                    if (!cont.isActive) break
+                    while (paused) {
+                        delay(50)
+                        if (!cont.isActive) break
+                    }
+                    val effective = if (speed == 1.0f) buffer.copyOf(read) else resample(buffer, read, frameSize, speed)
+                    output.write(effective, 0, effective.size)
+                    framesPlayed += read / frameSize
+                    positionMs = if (frameRate > 0) (framesPlayed / frameRate * 1000).toLong() else positionMs
+                    read = stream.read(buffer)
+                }
+                output.drain()
+                output.stop()
+                output.close()
+                line = null
                 stopPositionUpdates()
-                _playbackState.update { it.copy(status = PlaybackStatus.Error, errorMessage = error.message) }
-                if (cont.isActive) cont.resumeWithException(error)
-            }
-
-            override fun onIsPlayingChanged(isPlaying: Boolean) {
-                val status = if (isPlaying) PlaybackStatus.Playing else PlaybackStatus.Paused
-                _playbackState.update { it.copy(status = status) }
-                if (isPlaying) startPositionUpdates() else stopPositionUpdates()
+                if (cont.isActive) {
+                    _playbackState.update {
+                        it.copy(status = PlaybackStatus.Ended, positionMs = it.durationMs)
+                    }
+                    cont.resume(Unit)
+                }
+            } catch (e: Exception) {
+                stopPositionUpdates()
+                android.util.Log.e("AudioPlayer", "playback failed", e)
+                _playbackState.update {
+                    it.copy(status = PlaybackStatus.Error, errorMessage = e.message ?: "playback failed")
+                }
+                if (cont.isActive) cont.resumeWithException(e)
             }
         }
-        player.addListener(listener)
+
         cont.invokeOnCancellation {
-            player.removeListener(listener)
-            player.stop()
+            playJob?.cancel()
             stopPositionUpdates()
+            runCatching {
+                line?.stop()
+                line?.close()
+            }
+            line = null
         }
     }
 
     private fun startPositionUpdates() {
-        if (positionJob?.isActive == true) return
-        positionJob = scope.launch(Dispatchers.Main.immediate) {
+        positionJob?.cancel()
+        positionJob = scope.launch {
             while (true) {
-                _playbackState.update {
-                    it.copy(
-                        positionMs = player.currentPosition,
-                        durationMs = if (player.duration > 0) player.duration else it.durationMs
-                    )
-                }
+                _playbackState.update { it.copy(positionMs = positionMs) }
                 delay(100)
             }
         }
@@ -150,6 +188,26 @@ class AudioPlayer(context: Context) {
     private fun stopPositionUpdates() {
         positionJob?.cancel()
         positionJob = null
+    }
+
+    /** Naive linear-interpolation resampler used for playback speed control. */
+    private fun resample(buffer: ByteArray, length: Int, frameSize: Int, speed: Float): ByteArray {
+        if (frameSize != 2) return buffer.copyOf(length)
+        val inFrames = length / 2
+        val outFrames = (inFrames / speed).toInt().coerceAtLeast(1)
+        val out = ByteArray(outFrames * 2)
+        for (i in 0 until outFrames) {
+            val srcPos = i * speed
+            val i0 = srcPos.toInt().coerceIn(0, inFrames - 1)
+            val i1 = (i0 + 1).coerceAtMost(inFrames - 1)
+            val frac = srcPos - i0
+            val s0 = ((buffer[i0 * 2 + 1].toInt() shl 8) or (buffer[i0 * 2].toInt() and 0xFF))
+            val s1 = ((buffer[i1 * 2 + 1].toInt() shl 8) or (buffer[i1 * 2].toInt() and 0xFF))
+            val sample = (s0 + (s1 - s0) * frac).toInt().coerceIn(-32768, 32767)
+            out[i * 2] = (sample and 0xFF).toByte()
+            out[i * 2 + 1] = ((sample shr 8) and 0xFF).toByte()
+        }
+        return out
     }
 
     private fun pcmToWav(
@@ -191,4 +249,3 @@ class AudioPlayer(context: Context) {
         ((value.toInt() shr 8) and 0xFF).toByte()
     )
 }
-

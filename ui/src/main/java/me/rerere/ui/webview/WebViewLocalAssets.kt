@@ -11,9 +11,6 @@ const val WEB_VIEW_BASE_URL = "https://rikkahub.local"
 
 /**
  * 虚拟域名下的静态资源前缀，会被映射到 app 的 assets 目录。
- *
- * 例如 `https://rikkahub.local/assets/html/mermaid.min.js` 对应 `assets/html/mermaid.min.js`，
- * 这样 mermaid/katex 之类的库可以本地加载，而不用从 CDN 下载（首次加载可能需要几十秒）。
  */
 const val WEB_VIEW_ASSET_URL = "$WEB_VIEW_BASE_URL/assets"
 
@@ -39,18 +36,24 @@ internal object WebViewLocalAssets {
         }.getOrNull()
     }
 
-    private fun mimeTypeOf(path: String): String = when (path.substringAfterLast('.', "").lowercase()) {
-        "js", "mjs" -> "text/javascript"
-        "css" -> "text/css"
-        "html", "htm" -> "text/html"
-        "json" -> "application/json"
-        "svg" -> "image/svg+xml"
-        "png" -> "image/png"
-        "jpg", "jpeg" -> "image/jpeg"
-        "webp" -> "image/webp"
-        "woff2" -> "font/woff2"
-        "woff" -> "font/woff"
-        "ttf" -> "font/ttf"
-        else -> "application/octet-stream"
+    private fun mimeTypeOf(path: String): String {
+        val extension = path.substringAfterLast('.', "").lowercase()
+        return when (extension) {
+            "html", "htm" -> "text/html"
+            "js", "mjs" -> "application/javascript"
+            "css" -> "text/css"
+            "json" -> "application/json"
+            "svg" -> "image/svg+xml"
+            "png" -> "image/png"
+            "jpg", "jpeg" -> "image/jpeg"
+            "gif" -> "image/gif"
+            "webp" -> "image/webp"
+            "woff" -> "font/woff"
+            "woff2" -> "font/woff2"
+            "ttf" -> "font/ttf"
+            "wasm" -> "application/wasm"
+            "txt" -> "text/plain"
+            else -> "application/octet-stream"
+        }
     }
 }

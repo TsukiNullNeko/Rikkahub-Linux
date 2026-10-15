@@ -594,7 +594,14 @@ private fun TextInputRow(
             modifier = Modifier
                 .fillMaxWidth()
                 .testTag("chat_input")
-                .contentReceiver(receiveContentListener)
+                .then(
+                    // Desktop 的 CMP 实现尚未支持粘贴接收（skiko 侧为 TODO），仅 Android 生效
+                    if (me.rerere.rikkahub.BuildConfig.ANDROID) {
+                        Modifier.contentReceiver(receiveContentListener)
+                    } else {
+                        Modifier
+                    }
+                )
                 .onFocusChanged {
                     isFocused = it.isFocused
                 },
@@ -785,7 +792,7 @@ private fun FullScreenEditor(
             onDone()
         },
         properties = DialogProperties(
-            usePlatformDefaultWidth = false, decorFitsSystemWindows = false
+            usePlatformDefaultWidth = false
         ),
     ) {
         Column(

@@ -130,53 +130,53 @@ class BitmapFactory {
     }
 
     companion object {
-        fun decodeFile(pathName: String): Bitmap? = decodeFile(pathName, null)
+        fun decodeFile(pathName: String): Bitmap = decodeFile(pathName, null)
 
-        fun decodeFile(pathName: String, opts: Options?): Bitmap? {
+        fun decodeFile(pathName: String, opts: Options?): Bitmap {
             return try {
                 val file = java.io.File(pathName)
-                if (!file.exists()) return null
-                val img = ImageIO.read(file) ?: return null
+                if (!file.exists()) return Bitmap.createBitmap(1, 1)
+                val img = ImageIO.read(file) ?: return Bitmap.createBitmap(1, 1)
                 opts?.let { it.outWidth = img.width; it.outHeight = img.height }
-                if (opts?.inJustDecodeBounds == true) return null
+                if (opts?.inJustDecodeBounds == true) return Bitmap.createBitmap(1, 1)
                 Bitmap(img)
             } catch (e: Exception) {
                 android.util.Log.e("BitmapFactory", "decodeFile failed", e)
-                null
+                Bitmap.createBitmap(1, 1)
             }
         }
 
-        fun decodeStream(input: java.io.InputStream?): Bitmap? = decodeStream(input, null)
+        fun decodeStream(input: java.io.InputStream?): Bitmap = decodeStream(input, null)
 
-        fun decodeStream(input: java.io.InputStream?, outPadding: android.graphics.Rect?, opts: Options?): Bitmap? =
+        fun decodeStream(input: java.io.InputStream?, outPadding: android.graphics.Rect?, opts: Options?): Bitmap =
             decodeStream(input, opts)
 
-        fun decodeFile(pathName: String, outPadding: android.graphics.Rect?, opts: Options?): Bitmap? =
+        fun decodeFile(pathName: String, outPadding: android.graphics.Rect?, opts: Options?): Bitmap =
             decodeFile(pathName, opts)
 
-        fun decodeByteArray(data: ByteArray, offset: Int, length: Int, opts: Options?, outPadding: android.graphics.Rect?): Bitmap? =
+        fun decodeByteArray(data: ByteArray, offset: Int, length: Int, opts: Options?, outPadding: android.graphics.Rect?): Bitmap =
             decodeByteArray(data, offset, length, opts)
 
-        fun decodeStream(input: java.io.InputStream?, opts: Options?): Bitmap? {
-            if (input == null) return null
+        fun decodeStream(input: java.io.InputStream?, opts: Options?): Bitmap {
+            if (input == null) return Bitmap.createBitmap(1, 1)
             return try {
-                val img = ImageIO.read(input) ?: return null
+                val img = ImageIO.read(input) ?: return Bitmap.createBitmap(1, 1)
                 opts?.let { it.outWidth = img.width; it.outHeight = img.height }
                 Bitmap(img)
             } catch (e: Exception) {
-                null
+                Bitmap.createBitmap(1, 1)
             }
         }
 
-        fun decodeByteArray(data: ByteArray, offset: Int, length: Int): Bitmap? = decodeByteArray(data, offset, length, null)
+        fun decodeByteArray(data: ByteArray, offset: Int, length: Int): Bitmap = decodeByteArray(data, offset, length, null)
 
-        fun decodeByteArray(data: ByteArray, offset: Int, length: Int, opts: Options?): Bitmap? {
+        fun decodeByteArray(data: ByteArray, offset: Int, length: Int, opts: Options?): Bitmap {
             return try {
-                val img = ImageIO.read(java.io.ByteArrayInputStream(data, offset, length)) ?: return null
+                val img = ImageIO.read(java.io.ByteArrayInputStream(data, offset, length)) ?: return Bitmap.createBitmap(1, 1)
                 opts?.let { it.outWidth = img.width; it.outHeight = img.height }
                 Bitmap(img)
             } catch (e: Exception) {
-                null
+                Bitmap.createBitmap(1, 1)
             }
         }
 
@@ -258,8 +258,8 @@ class Rect {
         this.left = left; this.top = top; this.right = right; this.bottom = bottom
     }
 
-    val width: Int get() = right - left
-    val height: Int get() = bottom - top
+    fun width(): Int = right - left
+    fun height(): Int = bottom - top
     fun centerX(): Int = (left + right) / 2
     fun centerY(): Int = (top + bottom) / 2
     fun isEmpty(): Boolean = left >= right || top >= bottom
@@ -318,6 +318,15 @@ class Typeface private constructor(val name: String, val style: Int) {
         val MONOSPACE: Typeface = Typeface("monospace", NORMAL)
 
         fun create(familyName: String, style: Int): Typeface = Typeface(familyName, style)
+
+        @JvmStatic
+        fun createFromFile(path: java.io.File): Typeface = Typeface(path.name, NORMAL)
+
+        @JvmStatic
+        fun createFromFile(path: String): Typeface = Typeface(java.io.File(path).name, NORMAL)
+
+        @JvmStatic
+        fun createFromAsset(manager: Any?, path: String): Typeface = Typeface(path, NORMAL)
         fun create(family: Typeface?, style: Int): Typeface = Typeface(family?.name ?: "default", style)
         fun defaultFromStyle(style: Int): Typeface = Typeface("default", style)
     }

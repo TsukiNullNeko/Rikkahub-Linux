@@ -8,6 +8,12 @@ object Build {
     object VERSION {
         const val SDK_INT = 36
         const val RELEASE = "16"
+
+        @JvmStatic
+        fun isAtLeast(minSdk: Int): Boolean = SDK_INT >= minSdk
+
+        @JvmStatic
+        fun isAtLeastO(): Boolean = SDK_INT >= 26
     }
 
     object VERSION_CODES {
@@ -31,6 +37,17 @@ object Build {
     const val MODEL = "Linux Desktop"
     const val MANUFACTURER = "RikkaHub-Linux"
     const val DEVICE = "desktop"
+    const val BRAND = "RikkaHub"
+    const val PRODUCT = "rikkahub"
+    const val FINGERPRINT = "rikkahub/linux"
+    const val HARDWARE = "desktop"
+    const val BOARD = "desktop"
+    const val DISPLAY = "rikkahub-linux"
+    const val ID = "linux"
+    const val TAGS = "release-keys"
+    const val TYPE = "user"
+    const val HOST = "localhost"
+    const val USER = "rikkahub"
 }
 
 object SystemClock {
@@ -156,7 +173,8 @@ object Environment {
     fun isExternalStorageEmulated(): Boolean = true
 }
 
-object BatteryManager {
+class BatteryManager {
+    companion object {
     const val BATTERY_STATUS_DISCHARGING = 3
     const val BATTERY_STATUS_FULL = 5
     const val BATTERY_STATUS_CHARGING = 2
@@ -167,6 +185,21 @@ object BatteryManager {
     const val EXTRA_LEVEL = "level"
     const val EXTRA_SCALE = "scale"
     const val EXTRA_PLUGGED = "plugged"
+    const val BATTERY_PROPERTY_STATUS = 6
+    const val BATTERY_PROPERTY_CHARGE_COUNTER = 1
+    const val BATTERY_PROPERTY_CURRENT_NOW = 2
+    const val BATTERY_PROPERTY_CURRENT_AVERAGE = 3
+    const val BATTERY_PROPERTY_ENERGY_COUNTER = 5
+    }
+
+    fun getIntProperty(id: Int): Int = when (id) {
+        BATTERY_PROPERTY_CAPACITY -> 100
+        BATTERY_PROPERTY_STATUS -> BATTERY_STATUS_FULL
+        else -> 0
+    }
+
+    fun getLongProperty(id: Int): Long = 0L
+    fun isCharging(): Boolean = true
 }
 
 /** Desktop stand-in for android.os.LocaleList. */

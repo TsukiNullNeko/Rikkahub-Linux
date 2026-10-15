@@ -8,6 +8,8 @@ class ClipData private constructor(val description: CharSequence?) {
     val items = mutableListOf<Item>()
     val itemCount: Int get() = items.size
 
+    fun getItemAt(index: Int): Item = items[index]
+
     class Item(val text: CharSequence?, val uri: android.net.Uri? = null) {
         fun coerceToText(context: Context?): CharSequence = text ?: uri?.toString() ?: ""
         companion object {

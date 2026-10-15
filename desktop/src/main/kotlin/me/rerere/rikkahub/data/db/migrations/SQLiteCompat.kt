@@ -70,7 +70,7 @@ class CompatCursor(private val statement: SQLiteStatement) : AutoCloseable {
 
     fun getColumnCount(): Int = statement.getColumnCount()
 
-    fun getString(index: Int): String? = if (statement.isNull(index)) null else statement.getText(index)
+    fun getString(index: Int): String = if (statement.isNull(index)) "" else statement.getText(index)
 
     fun getLong(index: Int): Long = statement.getLong(index)
 

@@ -46,7 +46,7 @@ class ChatNotificationManager(
 
     init {
         // ProcessLifecycleOwner 要求在主线程注册观察者
-        appScope.launch {
+        appScope.launch(kotlinx.coroutines.Dispatchers.Main.immediate) {
             ProcessLifecycleOwner.get().lifecycle.addObserver(
                 LifecycleEventObserver { _, event ->
                     when (event) {

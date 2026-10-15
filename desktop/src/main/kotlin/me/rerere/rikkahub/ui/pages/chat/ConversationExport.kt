@@ -63,7 +63,6 @@ import androidx.navigation3.runtime.NavKey
 import me.rerere.rikkahub.ui.context.Navigator
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
-import coil3.request.allowHardware
 import coil3.request.crossfade
 import com.dokar.sonner.ToastType
 import kotlinx.coroutines.CoroutineScope
@@ -635,9 +634,8 @@ private fun ExportedChatMessage(
 
                             is UIMessagePart.Image -> {
                                 AsyncImage(
-                                    model = ImageRequest.Builder(context)
+                                    model = ImageRequest.Builder(coil3.PlatformContext.INSTANCE)
                                         .data(part.url)
-                                        .allowHardware(false)
                                         .crossfade(false)
                                         .build(),
                                     contentDescription = "Image",

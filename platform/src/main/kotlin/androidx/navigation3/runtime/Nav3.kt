@@ -1,13 +1,9 @@
 package androidx.navigation3.runtime
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.snapshots.SnapshotStateList
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.toMutableStateList
 import kotlinx.serialization.Serializable
-import java.util.UUID
 
 /** Marker interface for navigation keys. */
 interface NavKey : java.io.Serializable
@@ -32,10 +28,12 @@ class EntryProviderBuilder<T : Any> @PublishedApi internal constructor() {
         metadata: Map<String, Any> = emptyMap(),
         noinline content: @Composable (K) -> Unit
     ) {
+        val contentFn = content
         builders.add { key ->
+            // Avoid unchecked casts of composable lambdas: call the typed function directly.
             if (key::class == K::class) {
                 @Suppress("UNCHECKED_CAST")
-                NavEntry(key, metadata, content as @Composable (T) -> Unit)
+                NavEntry(key, metadata) { k -> contentFn(k as K) }
             } else {
                 null
             }
@@ -68,7 +66,9 @@ fun rememberNavBackStack(vararg initialKeys: NavKey): NavBackStack {
 }
 
 object NavBackStackSaver : androidx.compose.runtime.saveable.Saver<NavBackStack, List<NavKey>> {
-    override fun androidx.compose.runtime.saveable.SaverScope.save(value: NavBackStack): List<NavKey> = value.toList()
+    override fun androidx.compose.runtime.saveable.SaverScope.save(value: NavBackStack): List<NavKey> =
+        value.toList()
+
     override fun restore(value: List<NavKey>): NavBackStack = NavBackStack(value)
 }
 

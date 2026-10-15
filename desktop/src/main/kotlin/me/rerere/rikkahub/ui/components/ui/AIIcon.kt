@@ -15,7 +15,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
-import coil3.svg.css
 import me.rerere.rikkahub.R
 import me.rerere.rikkahub.ui.hooks.rememberAvatarShape
 import me.rerere.rikkahub.ui.theme.LocalDarkMode
@@ -33,15 +32,8 @@ private fun AIIcon(
     val contentColor = LocalContentColor.current
     val context = LocalContext.current
     val model = remember(path, contentColor, context) {
-        ImageRequest.Builder(context)
-            .data("file:///android_asset/icons/$path")
-            .css(
-                """
-                svg {
-                  fill: ${contentColor.toCssHex()};
-                }
-            """.trimIndent()
-            )
+        ImageRequest.Builder(coil3.PlatformContext.INSTANCE)
+            .data(path)
             .build()
     }
     Surface(

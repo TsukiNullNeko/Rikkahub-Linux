@@ -108,12 +108,7 @@ fun rememberVoiceModeStarter(vm: ChatVM, settings: Settings): () -> Unit {
     }
 
     if (state.isActive) {
-        val view = LocalView.current
-        DisposableEffect(view) {
-            val previous = view.keepScreenOn
-            view.keepScreenOn = true
-            onDispose { view.keepScreenOn = previous }
-        }
+        me.rerere.rikkahub.ui.components.ui.KeepScreenOn(enabled = true)
     }
     return start
 }
@@ -135,7 +130,7 @@ private fun createVoiceAsr(context: Context, client: OkHttpClient, provider: ASR
         else -> error(context.getString(R.string.chat_page_voice_no_endpointing))
     }
     val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-    val focus = AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE)
+    val focus = AudioFocusRequest.Builder(AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_VOICE_COMMUNICATION).build())
         .setAudioAttributes(AudioAttributes.Builder()
             .setUsage(AudioAttributes.USAGE_VOICE_COMMUNICATION)
             .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)

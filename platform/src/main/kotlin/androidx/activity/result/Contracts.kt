@@ -48,6 +48,12 @@ object ActivityResultContracts {
     class PickVisualMedia : ActivityResultContract<PickVisualMediaRequest, Uri?>() {
         override fun execute(input: PickVisualMediaRequest, context: Context?): Uri? =
             FileDialogHelper.pickFile("image/*", false)
+
+        sealed class VisualMediaType
+        object ImageOnly : VisualMediaType()
+        object VideoOnly : VisualMediaType()
+        object ImageAndVideo : VisualMediaType()
+        class SingleMimeType(val mimeType: String) : VisualMediaType()
     }
 
     class PickMultipleVisualMedia(maxItems: Int = 99) : ActivityResultContract<PickVisualMediaRequest, List<Uri>>() {

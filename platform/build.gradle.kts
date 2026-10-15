@@ -15,6 +15,7 @@ kotlin {
             "-opt-in=androidx.compose.foundation.layout.ExperimentalLayoutApi",
             "-opt-in=androidx.compose.animation.ExperimentalAnimationApi",
             "-opt-in=androidx.compose.ui.ExperimentalComposeUiApi",
+            "-opt-in=androidx.compose.ui.InternalComposeUiApi",
             "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
             "-opt-in=kotlinx.serialization.ExperimentalSerializationApi",
             "-opt-in=kotlin.ExperimentalStdlibApi",
@@ -29,6 +30,11 @@ java {
     targetCompatibility = JavaVersion.VERSION_21
 }
 
+// 排除 CMP 的空壳 lifecycle 桩（会用无类实现遮蔽真实的 androidx.lifecycle）
+configurations.configureEach {
+    exclude(group = "org.jetbrains.androidx.lifecycle")
+}
+
 dependencies {
     implementation(libs.org.json)
     api(compose.runtime)
@@ -39,7 +45,9 @@ dependencies {
     api(compose.animation)
     api(libs.kotlinx.coroutines.core)
     api(libs.lifecycle.viewmodel)
+    api(libs.lifecycle.runtime)
     api(libs.lifecycle.viewmodel.compose)
+    api(libs.lifecycle.runtime.compose)
     api(libs.lifecycle.runtime.compose)
     api(libs.koin.core)
     api(libs.koin.compose.viewmodel)

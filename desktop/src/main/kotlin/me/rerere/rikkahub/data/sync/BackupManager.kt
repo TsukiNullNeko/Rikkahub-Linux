@@ -128,7 +128,7 @@ class BackupManager(
                         // Reject unsupported schemas before publishing; run supported old migrations on the copy.
                         val room = AppDatabaseFactory.create(context, stagedDatabase.absolutePath)
                         try {
-                            DatabaseBackup.checkpoint(room.openHelper.writableDatabase)
+                            DatabaseBackup.checkpoint(stagedDatabase.absolutePath)
                         } finally {
                             room.close()
                         }

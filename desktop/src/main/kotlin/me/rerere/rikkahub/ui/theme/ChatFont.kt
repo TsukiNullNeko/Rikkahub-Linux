@@ -48,8 +48,13 @@ private fun loadCustomFontFamily(context: Context, relativePath: String): FontFa
     val file = resolveFilesDirFile(context, relativePath) ?: return null
     if (!file.isFile) return null
     return runCatching {
-        Typeface.createFromFile(file)
-        FontFamily(Font(file))
+        val platformFont = androidx.compose.ui.text.platform.FileFont(
+            file = file,
+            weight = androidx.compose.ui.text.font.FontWeight.Normal,
+            style = androidx.compose.ui.text.font.FontStyle.Normal,
+            variationSettings = androidx.compose.ui.text.font.FontVariation.Settings()
+        )
+        FontFamily(platformFont)
     }.getOrNull()
 }
 

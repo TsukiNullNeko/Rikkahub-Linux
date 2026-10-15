@@ -2,56 +2,66 @@
 package me.rerere.search
 
 object RStringTable {
-    val default: Map<Int, String> = mapOf(
+    private val defaultChunk0: Map<Int, String> by lazy { mapOf(
         2113929217 to "Note that Bing search is crawler-based, which may be unstable and is not recommended.",
         2113929218 to "Click to get API Key",
         2113929219 to "Custom search provider powered by QuickJS. Implement search(query, resultSize) and optionally scrape(urls) functions. Use fetch(url, options?) for HTTP requests.",
         2113929220 to "settings.yml needs to enable json format support:",
         2113929221 to "search:\n  formats:\n    - html\n    - json",
-    )
+    ) }
+    private val locarChunk0: Map<Int, String> by lazy { mapOf(
+        2113929217 to "لاحظ أن بحث Bing يعتمد على الزاحف، وقد يكون غير مستقر وغير موصى به.",
+        2113929218 to "انقر للحصول على مفتاح API",
+        2113929219 to "مزوّد بحث مخصص مدعوم بواسطة QuickJS. نفّذ الدالة search(query, resultSize) واختياريًا الدالة scrape(urls). استخدم fetch(url, options?) لطلبات HTTP.",
+        2113929220 to "يجب تفعيل دعم تنسيق json في settings.yml:",
+        2113929221 to "search:\n  formats:\n    - html\n    - json",
+    ) }
+    private val locjaChunk0: Map<Int, String> by lazy { mapOf(
+        2113929217 to "Bing検索は現在クローラーベースで、アクセス制限によりブロックされやすく、推奨されません",
+        2113929218 to "クリックしてAPI Keyを取得",
+        2113929220 to "settings.yml内でjson formatサポートを有効にする必要があります:",
+        2113929221 to "search:\n  formats:\n    - html\n    - json",
+        2113929219 to "QuickJSを利用したカスタム検索プロバイダー。search(query, resultSize)関数を実装し、オプションでscrape(urls)関数も実装できます。HTTPリクエストにはfetch(url, options?)を使用します。",
+    ) }
+    private val locko_rKRChunk0: Map<Int, String> by lazy { mapOf(
+        2113929217 to "Bing 검색은 크롤러 기반으로, 불안정할 수 있어 권장되지 않습니다.",
+        2113929218 to "API 키를 받으려면 클릭하세요.",
+        2113929220 to "settings.yml에서 JSON 형식 지원을 활성화해야 합니다:",
+        2113929221 to "search:\n  formats:\n    - html\n    - json",
+        2113929219 to "QuickJS 기반의 맞춤 검색 제공자입니다. search(query, resultSize) 함수를 구현하고, 선택적으로 scrape(urls) 함수를 구현하세요. HTTP 요청에는 fetch(url, options?)를 사용하세요.",
+    ) }
+    private val locruChunk0: Map<Int, String> by lazy { mapOf(
+        2113929217 to "Обратите внимание: поиск Bing основан на краулере, может быть нестабильным и не рекомендуется.",
+        2113929218 to "Нажмите, чтобы получить ключ API",
+        2113929220 to "в settings.yml нужно включить поддержку формата json:",
+        2113929221 to "поиск:\n  форматы:\n    - html\n    - json",
+        2113929219 to "Пользовательский поисковый провайдер на базе QuickJS. Реализуйте функции search(query, resultSize) и при необходимости scrape(urls). Используйте fetch(url, options?) для HTTP-запросов.",
+    ) }
+    private val loczhChunk0: Map<Int, String> by lazy { mapOf(
+        2113929217 to "注意Bing搜索目前基于爬虫，很容易被风控拦截，不推荐使用",
+        2113929218 to "点击获取API Key",
+        2113929220 to "settings.yml内需要开启json format支持:",
+        2113929221 to "search:\n  formats:\n    - html\n    - json",
+        2113929219 to "由 QuickJS 驱动的自定义搜索提供程序。实现 search(query, resultSize) 函数，并可选择实现 scrape(urls) 函数。使用 fetch(url, options?) 进行 HTTP 请求。",
+    ) }
+    private val loczh_rTWChunk0: Map<Int, String> by lazy { mapOf(
+        2113929217 to "注意Bing搜尋目前基於爬蟲，很容易被風控攔截，不推薦使用",
+        2113929218 to "點擊獲取API Key",
+        2113929220 to "settings.yml內需要開啟json format支援:",
+        2113929221 to "search:\n  formats:\n    - html\n    - json",
+        2113929219 to "由 QuickJS 驅動的自訂搜尋提供者。實作 search(query, resultSize) 函式，並可選擇實作 scrape(urls) 函式。使用 fetch(url, options?) 進行 HTTP 請求。",
+    ) }
 
-    val byLocale: Map<String, Map<Int, String>> = mapOf(
-        "ar" to mapOf(
-            2113929217 to "لاحظ أن بحث Bing يعتمد على الزاحف، وقد يكون غير مستقر وغير موصى به.",
-            2113929218 to "انقر للحصول على مفتاح API",
-            2113929219 to "مزوّد بحث مخصص مدعوم بواسطة QuickJS. نفّذ الدالة search(query, resultSize) واختياريًا الدالة scrape(urls). استخدم fetch(url, options?) لطلبات HTTP.",
-            2113929220 to "يجب تفعيل دعم تنسيق json في settings.yml:",
-            2113929221 to "search:\n  formats:\n    - html\n    - json",
-        ),
-        "ja" to mapOf(
-            2113929217 to "Bing検索は現在クローラーベースで、アクセス制限によりブロックされやすく、推奨されません",
-            2113929218 to "クリックしてAPI Keyを取得",
-            2113929220 to "settings.yml内でjson formatサポートを有効にする必要があります:",
-            2113929221 to "search:\n  formats:\n    - html\n    - json",
-            2113929219 to "QuickJSを利用したカスタム検索プロバイダー。search(query, resultSize)関数を実装し、オプションでscrape(urls)関数も実装できます。HTTPリクエストにはfetch(url, options?)を使用します。",
-        ),
-        "ko-rKR" to mapOf(
-            2113929217 to "Bing 검색은 크롤러 기반으로, 불안정할 수 있어 권장되지 않습니다.",
-            2113929218 to "API 키를 받으려면 클릭하세요.",
-            2113929220 to "settings.yml에서 JSON 형식 지원을 활성화해야 합니다:",
-            2113929221 to "search:\n  formats:\n    - html\n    - json",
-            2113929219 to "QuickJS 기반의 맞춤 검색 제공자입니다. search(query, resultSize) 함수를 구현하고, 선택적으로 scrape(urls) 함수를 구현하세요. HTTP 요청에는 fetch(url, options?)를 사용하세요.",
-        ),
-        "ru" to mapOf(
-            2113929217 to "Обратите внимание: поиск Bing основан на краулере, может быть нестабильным и не рекомендуется.",
-            2113929218 to "Нажмите, чтобы получить ключ API",
-            2113929220 to "в settings.yml нужно включить поддержку формата json:",
-            2113929221 to "поиск:\n  форматы:\n    - html\n    - json",
-            2113929219 to "Пользовательский поисковый провайдер на базе QuickJS. Реализуйте функции search(query, resultSize) и при необходимости scrape(urls). Используйте fetch(url, options?) для HTTP-запросов.",
-        ),
-        "zh" to mapOf(
-            2113929217 to "注意Bing搜索目前基于爬虫，很容易被风控拦截，不推荐使用",
-            2113929218 to "点击获取API Key",
-            2113929220 to "settings.yml内需要开启json format支持:",
-            2113929221 to "search:\n  formats:\n    - html\n    - json",
-            2113929219 to "由 QuickJS 驱动的自定义搜索提供程序。实现 search(query, resultSize) 函数，并可选择实现 scrape(urls) 函数。使用 fetch(url, options?) 进行 HTTP 请求。",
-        ),
-        "zh-rTW" to mapOf(
-            2113929217 to "注意Bing搜尋目前基於爬蟲，很容易被風控攔截，不推薦使用",
-            2113929218 to "點擊獲取API Key",
-            2113929220 to "settings.yml內需要開啟json format支援:",
-            2113929221 to "search:\n  formats:\n    - html\n    - json",
-            2113929219 to "由 QuickJS 驅動的自訂搜尋提供者。實作 search(query, resultSize) 函式，並可選擇實作 scrape(urls) 函式。使用 fetch(url, options?) 進行 HTTP 請求。",
-        ),
-    )
+    val default: Map<Int, String> by lazy { defaultChunk0 }
+
+    val byLocale: Map<String, Map<Int, String>> by lazy {
+        mapOf(
+            "ar" to (locarChunk0),
+            "ja" to (locjaChunk0),
+            "ko-rKR" to (locko_rKRChunk0),
+            "ru" to (locruChunk0),
+            "zh" to (loczhChunk0),
+            "zh-rTW" to (loczh_rTWChunk0),
+        )
+    }
 }

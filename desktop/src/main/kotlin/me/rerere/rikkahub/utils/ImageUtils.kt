@@ -256,7 +256,7 @@ object ImageUtils {
      */
     fun recycleBitmapSafely(bitmap: Bitmap?) {
         bitmap?.let {
-            if (!it.isRecycled) {
+            if (!it.isRecycled()) {
                 it.recycle()
             }
         }

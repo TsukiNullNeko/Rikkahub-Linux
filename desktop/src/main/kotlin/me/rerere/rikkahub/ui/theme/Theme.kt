@@ -17,8 +17,8 @@ import me.rerere.rikkahub.ui.hooks.rememberAmoledDarkMode
 import me.rerere.rikkahub.ui.hooks.rememberCurrentColorMode
 import me.rerere.rikkahub.ui.hooks.rememberUserSettingsState
 import androidx.compose.ui.graphics.toArgb
-import dynamiccolor.Hct
-import dynamiccolor.SchemeTonalSpot
+import hct.Hct
+import scheme.SchemeTonalSpot
 import me.rerere.material3.toColorScheme
 
 private val ExtendLightColors = lightExtendColors()

@@ -183,7 +183,7 @@ fun ErrorCard(
                     scope.launch {
                         clipboard.setClipEntry(
                             ClipEntry(
-                                clipData = ClipData.newPlainText("Error", error.error.message ?: "Unknown error")
+                                java.awt.datatransfer.StringSelection(error.error.message ?: "Unknown error")
                             )
                         )
                     }

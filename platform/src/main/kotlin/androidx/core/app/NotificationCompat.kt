@@ -93,6 +93,16 @@ object NotificationCompat {
     const val CATEGORY_PROGRESS = "progress"
     const val CATEGORY_MESSAGE = "msg"
     const val CATEGORY_SERVICE = "service"
+    const val CATEGORY_STATUS = "status"
+    const val CATEGORY_CALL = "call"
+    const val CATEGORY_EMAIL = "email"
+    const val CATEGORY_EVENT = "event"
+    const val CATEGORY_ALARM = "alarm"
+    const val CATEGORY_REMINDER = "reminder"
+    const val CATEGORY_TRANSPORT = "transport"
+    const val CATEGORY_SOCIAL = "social"
+    const val CATEGORY_RECOMMENDATION = "recommendation"
+    const val CATEGORY_NAVIGATION = "navigation"
     const val DEFAULT_ALL = -1
     const val DEFAULT_SOUND = 1
     const val DEFAULT_VIBRATE = 2

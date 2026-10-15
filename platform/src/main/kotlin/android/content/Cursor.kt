@@ -9,7 +9,7 @@ interface Cursor : AutoCloseable {
     fun moveToPosition(position: Int): Boolean
     fun getColumnIndex(name: String): Int
     fun getColumnIndexOrThrow(name: String): Int
-    fun getString(index: Int): String?
+    fun getString(index: Int): String
     fun getInt(index: Int): Int
     fun getLong(index: Int): Long
     fun getBlob(index: Int): ByteArray?
@@ -33,7 +33,7 @@ class MatrixCursor(columnNames: Array<String>, initialCapacity: Int = 16) : Curs
     override fun moveToPosition(position: Int): Boolean { if (position < rows.size) { pos = position; return true }; return false }
     override fun getColumnIndex(name: String): Int = columnNames.indexOf(name)
     override fun getColumnIndexOrThrow(name: String): Int = getColumnIndex(name).also { if (it < 0) throw IllegalArgumentException("no column " + name) }
-    override fun getString(index: Int): String? = rows.getOrNull(pos)?.getOrNull(index) as? String
+    override fun getString(index: Int): String = (rows.getOrNull(pos)?.getOrNull(index) as? String) ?: ""
     override fun getInt(index: Int): Int = (rows.getOrNull(pos)?.getOrNull(index) as? Number)?.toInt() ?: 0
     override fun getLong(index: Int): Long = (rows.getOrNull(pos)?.getOrNull(index) as? Number)?.toLong() ?: 0L
     override fun getBlob(index: Int): ByteArray? = rows.getOrNull(pos)?.getOrNull(index) as? ByteArray

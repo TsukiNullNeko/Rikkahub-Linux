@@ -57,6 +57,15 @@ object DateUtils {
     fun getRelativeTimeSpanString(context: Any?, millis: Long, flags: Int): CharSequence =
         getRelativeTimeSpanString(millis)
 
+    fun getRelativeTimeSpanString(millis: Long, now: Long, minResolution: Long): CharSequence =
+        getRelativeTimeSpanString(millis)
+
+    fun getRelativeTimeSpanString(millis: Long, now: Long, minResolution: Int): CharSequence =
+        getRelativeTimeSpanString(millis)
+
+    fun getRelativeTimeSpanString(millis: Long, now: Long, minResolution: Long, flags: Int): CharSequence =
+        getRelativeTimeSpanString(millis)
+
     fun isToday(millis: Long): Boolean {
         val cal1 = Calendar.getInstance()
         val cal2 = Calendar.getInstance()

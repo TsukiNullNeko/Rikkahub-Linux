@@ -18,3 +18,16 @@ inline fun <reified VM : ViewModel> koinViewModel(
     qualifier = qualifier,
     parameters = parameters
 )
+
+@Composable
+inline fun <reified VM : ViewModel> koinViewModel(
+    viewModelStoreOwner: androidx.lifecycle.ViewModelStoreOwner,
+    key: String? = null,
+    qualifier: Qualifier? = null,
+    noinline parameters: ParametersDefinition? = null
+): VM = org.koin.compose.viewmodel.koinViewModel(
+    qualifier = qualifier,
+    viewModelStoreOwner = viewModelStoreOwner,
+    key = key,
+    parameters = parameters
+)

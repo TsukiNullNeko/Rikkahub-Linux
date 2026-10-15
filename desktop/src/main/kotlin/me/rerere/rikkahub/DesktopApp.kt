@@ -36,6 +36,7 @@ class AppScope : CoroutineScope by CoroutineScope(
 
 /** Build-time generated application metadata (replaces the Android BuildConfig). */
 object BuildConfig {
+    const val ANDROID = false
     const val DEBUG = false
     const val APPLICATION_ID = "me.rerere.rikkahub"
     const val BUILD_TYPE = "release"
@@ -57,11 +58,24 @@ object RikkaHubApp {
         if (started) return
         started = true
 
-        // Load localized strings into the resource shim
+        // Load localized strings and drawable resources into the platform shims
         RStringRegistry.register(Locale.getDefault())
+        androidx.compose.ui.res.DrawableResourceRegistry.byId = RDrawableTable.byId
 
         startKoin {
-            modules(appModule, viewModelModule, dataSourceModule, repositoryModule)
+            modules(
+                appModule,
+                viewModelModule,
+                dataSourceModule,
+                repositoryModule,
+                // Desktop application context wiring (Android provides these via androidContext()).
+                module {
+                    single<android.content.Context> { AppContext.appContext }
+                    single<android.app.Application> { android.app.Application() }
+                    single<com.google.firebase.analytics.FirebaseAnalytics> { com.google.firebase.analytics.FirebaseAnalytics() }
+                    single<com.google.firebase.FirebaseCrashlytics> { com.google.firebase.FirebaseCrashlytics }
+                }
+            )
         }
 
         Log.i(TAG, "RikkaHub started, data dir: " + AppContext.dataDir.absolutePath)

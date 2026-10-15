@@ -50,6 +50,7 @@ class Intent : Parcelable {
     var action: String? = null
     var data: Uri? = null
     var type: String? = null
+    var flags: Int = 0
     private val extras = Bundle()
 
     constructor()
@@ -71,8 +72,8 @@ class Intent : Parcelable {
 
     fun hasCategory(category: String?): Boolean = category != null && categories.contains(category)
 
-    fun addFlags(flags: Int): Intent { return this }
-    fun setFlags(flags: Int): Intent { return this }
+    fun addFlags(flags: Int): Intent { this.flags = this.flags or flags; return this }
+    fun setFlags(flags: Int): Intent { this.flags = flags; return this }
     fun setPackage(pkg: String?): Intent { return this }
     fun setClassName(pkg: String, cls: String): Intent { return this }
 
@@ -83,6 +84,7 @@ class Intent : Parcelable {
     fun putExtra(name: String, value: Array<String>?): Intent { extras.putStringArray(name, value); return this }
     fun putExtra(name: String, value: Serializable?): Intent { extras.putSerializable(name, value); return this }
     fun putExtra(name: String, value: Parcelable?): Intent { extras.putSerializable(name, value as? Serializable); return this }
+    fun putExtra(name: String, value: android.net.Uri?): Intent { extras.putString(name, value?.toString()); return this }
 
     fun hasExtra(name: String): Boolean = extras.containsKey(name)
     fun removeExtra(name: String) { extras.remove(name) }

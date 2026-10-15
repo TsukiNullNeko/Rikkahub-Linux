@@ -9,8 +9,10 @@ open class Application : Context() {
     fun unregisterActivityLifecycleCallbacks(callbacks: Any) {}
 }
 
-open class Activity : Context() {
+open class Activity : Context(), androidx.lifecycle.ViewModelStoreOwner {
     override val packageName: String get() = "me.rerere.rikkahub"
+    override val viewModelStore: androidx.lifecycle.ViewModelStore by lazy { androidx.lifecycle.ViewModelStore() }
+    val volumeKeyListeners = mutableListOf<Any>()
     val window: Any? get() = null
     var intent: Intent = Intent()
     fun finish() {}
@@ -42,6 +44,8 @@ open class Service : Context() {
     open fun onUnbind(intent: android.content.Intent?): Boolean = false
     open fun onDestroy() {}
     open fun onLowMemory() {}
+    open fun onTimeout(startId: Int) {}
+    open fun onTimeout(startId: Int, fgsType: Int) {}
 
     fun stopSelf() {}
     fun stopSelf(startId: Int) {}
@@ -60,6 +64,11 @@ class ActivityInfo {
 class ApplicationInfo {
     var packageName: String = "me.rerere.rikkahub"
     var dataDir: String = android.content.AppContext.dataDir.absolutePath
+    var nativeLibraryDir: String = android.content.AppContext.dataDir.resolve("lib").absolutePath
+    var sourceDir: String = android.content.AppContext.dataDir.absolutePath
+    var name: String? = null
+    var labelRes: Int = 0
+    var flags: Int = 0
 }
 
 class KeyguardManager {
@@ -86,11 +95,25 @@ class DownloadManager {
     fun remove(ids: LongArray): Int = 0
 
     class Request(uri: android.net.Uri) {
+        companion object {
+            const val VISIBILITY_VISIBLE_NOTIFY_COMPLETED = 3
+            const val VISIBILITY_VISIBLE = 0
+            const val VISIBILITY_HIDDEN = 2
+            const val VISIBILITY_VISIBLE_NOTIFY_ONLY_COMPLETION = 1
+            const val NETWORK_WIFI = 1
+            const val NETWORK_MOBILE = 2
+            const val NETWORK_BLUETOOTH = 4
+            const val NETWORK_ETHERNET = 8
+        }
+
         fun setDestinationInExternalPublicDir(dirType: String, fileName: String): Request = this
         fun setDestinationUri(uri: android.net.Uri): Request = this
         fun setTitle(title: CharSequence?): Request = this
         fun setDescription(description: CharSequence?): Request = this
         fun setNotificationVisibility(visibility: Int): Request = this
+        fun setAllowedNetworkTypes(flags: Int): Request = this
+        fun setAllowedOverMetered(allow: Boolean): Request = this
+        fun setAllowedOverRoaming(allow: Boolean): Request = this
         fun setMimeType(mime: String?): Request = this
         fun addRequestHeader(header: String, value: String): Request = this
     }
@@ -105,5 +128,9 @@ class DownloadManager {
         const val STATUS_SUCCESSFUL = 8
         const val STATUS_FAILED = 16
         const val ERROR_INSUFFICIENT_SPACE = 1006
+        const val NETWORK_WIFI = 1
+        const val NETWORK_MOBILE = 2
+        const val NETWORK_BLUETOOTH = 4
+        const val NETWORK_ETHERNET = 8
     }
 }

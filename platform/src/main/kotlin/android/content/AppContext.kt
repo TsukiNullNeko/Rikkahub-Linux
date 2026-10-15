@@ -78,6 +78,11 @@ object AppContext {
         Context.KEYGUARD_SERVICE -> android.app.KeyguardManager()
         Context.POWER_SERVICE -> android.app.PowerManager()
         Context.USAGE_STATS_SERVICE -> android.app.usage.UsageStatsManager()
+        Context.BATTERY_SERVICE -> android.os.BatteryManager()
+        Context.AUDIO_SERVICE -> android.media.AudioManager()
+        Context.WINDOW_SERVICE -> null
+        Context.INPUT_METHOD_SERVICE -> android.view.inputmethod.InputMethodManager()
+        Context.DOWNLOAD_SERVICE -> android.app.DownloadManager()
         else -> null
     }
 

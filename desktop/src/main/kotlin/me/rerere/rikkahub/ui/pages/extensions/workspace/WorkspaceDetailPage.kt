@@ -811,7 +811,7 @@ private fun WorkspaceFileCard(
                 val context = LocalContext.current
                 val imageRequest = remember(imageFile, entry.updatedAt, entry.sizeBytes) {
                     imageFile?.let {
-                        ImageRequest.Builder(context)
+                        ImageRequest.Builder(coil3.PlatformContext.INSTANCE)
                             .data(it)
                             .memoryCacheKey("workspace:${it.absolutePath}:${entry.updatedAt}:${entry.sizeBytes}")
                             .build()

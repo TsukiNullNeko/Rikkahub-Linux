@@ -1,7 +1,6 @@
 package me.rerere.rikkahub.ui.pages.chat
 
 import android.app.Application
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
@@ -45,7 +44,7 @@ class ChatDrawerVM(
     private val folderRepo: FolderRepository,
     private val chatService: ChatService,
     private val memoryConsolidationScheduler: MemoryConsolidationScheduler,
-    private val savedStateHandle: SavedStateHandle,
+    
 ) : ViewModel() {
 
     private val assistantIdFlow = settingsStore.settingsFlow
@@ -116,8 +115,10 @@ class ChatDrawerVM(
             }
             .cachedIn(viewModelScope)
 
-    val scrollIndex: Int get() = savedStateHandle["scrollIndex"] ?: 0
-    val scrollOffset: Int get() = savedStateHandle["scrollOffset"] ?: 0
+    private var storedScrollIndex: Int = 0
+    val scrollIndex: Int get() = storedScrollIndex
+    private var storedScrollOffset: Int = 0
+    val scrollOffset: Int get() = storedScrollOffset
 
     init {
         // 助手切换时重置文件夹筛选，回到「聊天」视图，
@@ -130,8 +131,8 @@ class ChatDrawerVM(
     }
 
     fun saveScrollPosition(index: Int, offset: Int) {
-        savedStateHandle["scrollIndex"] = index
-        savedStateHandle["scrollOffset"] = offset
+        storedScrollIndex = index
+        storedScrollOffset = offset
     }
 
     fun selectFolder(folderId: Uuid?) {

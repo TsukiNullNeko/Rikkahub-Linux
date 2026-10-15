@@ -43,6 +43,20 @@ object RStringRegistry {
         add(me.rerere.search.RStringTable.default, me.rerere.search.RStringTable.byLocale)
         add(me.rerere.oauth.RStringTable.default, me.rerere.oauth.RStringTable.byLocale)
 
+        // Framework strings (android.R.string.*)
+        result[android.R.string.ok] = "OK"
+        result[android.R.string.cancel] = "Cancel"
+        result[android.R.string.yes] = "Yes"
+        result[android.R.string.no] = "No"
+        result[android.R.string.copy] = "Copy"
+        result[android.R.string.cut] = "Cut"
+        result[android.R.string.paste] = "Paste"
+        result[android.R.string.selectAll] = "Select all"
+        result[android.R.string.delete] = "Delete"
+        result[android.R.string.share] = "Share"
+        result[android.R.string.close] = "Close"
+        result[android.R.string.loading] = "Loading…"
+
         return result
     }
 }

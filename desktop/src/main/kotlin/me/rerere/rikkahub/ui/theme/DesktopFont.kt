@@ -22,7 +22,7 @@ fun desktopFont(
     getData = { loadFontBytes(name) },
     weight = weight,
     style = style,
-    variationSettings = variationSettings
+    variationSettings = variationSettings ?: FontVariation.Settings()
 )
 
 private val fontCache = HashMap<String, ByteArray>()

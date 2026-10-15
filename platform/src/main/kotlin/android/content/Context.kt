@@ -63,6 +63,18 @@ open class Context {
         AppContext.startActivity(intent)
     }
 
+    open fun startActivity(intent: Intent, options: android.os.Bundle?) {
+        AppContext.startActivity(intent)
+    }
+
+    open fun sendBroadcast(intent: Intent) {}
+
+    open fun startForegroundService(intent: Intent): Any? = null
+
+    open fun bindService(intent: Intent, conn: Any?, flags: Int): Boolean = false
+
+    open fun unbindService(conn: Any?) {}
+
     open fun startService(intent: Intent): Any? = null
     open fun stopService(intent: Intent): Boolean = true
 
@@ -99,6 +111,13 @@ open class Context {
 
     open val packageManager: PackageManager get() = AppContext.packageManager
 
+    open val applicationInfo: android.app.ApplicationInfo
+        get() = android.app.ApplicationInfo().apply {
+            packageName = this@Context.packageName
+            nativeLibraryDir = AppContext.dataDir.resolve("lib").absolutePath
+            dataDir = AppContext.dataDir.absolutePath
+        }
+
     companion object {
         const val CLIPBOARD_SERVICE = "clipboard"
         const val NOTIFICATION_SERVICE = "notification"
@@ -115,6 +134,7 @@ open class Context {
         const val ACTIVITY_SERVICE = "activity"
         const val LOCATION_SERVICE = "location"
         const val SENSOR_SERVICE = "sensor"
+        const val BATTERY_SERVICE = "batterymanager"
         const val MODE_PRIVATE = 0
         const val MODE_WORLD_READABLE = 1
         const val MODE_WORLD_WRITEABLE = 2

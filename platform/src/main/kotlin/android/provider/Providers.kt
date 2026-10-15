@@ -24,6 +24,10 @@ object MediaStore {
 
     object Images {
         const val MEDIA_TYPE = "media_type"
+        object Media {
+            val EXTERNAL_CONTENT_URI: Uri = Uri.parse("content://media/external/images/media")
+            val INTERNAL_CONTENT_URI: Uri = Uri.parse("content://media/internal/images/media")
+        }
         const val MEDIA_TYPE_IMAGE = 1
         const val _ID = MediaColumns._ID
         const val DATA = MediaColumns.DATA
@@ -40,17 +44,33 @@ object MediaStore {
     }
 
     object Video {
+        object Media {
+            val EXTERNAL_CONTENT_URI: Uri = Uri.parse("content://media/external/video/media")
+            val INTERNAL_CONTENT_URI: Uri = Uri.parse("content://media/internal/video/media")
+        }
         val EXTERNAL_CONTENT_URI: Uri = Uri.parse("content://media/external/video/media")
         const val MEDIA_TYPE_VIDEO = 3
     }
 
     object Audio {
+        object Media {
+            val EXTERNAL_CONTENT_URI: Uri = Uri.parse("content://media/external/audio/media")
+        }
         val EXTERNAL_CONTENT_URI: Uri = Uri.parse("content://media/external/audio/media")
         const val MEDIA_TYPE_AUDIO = 2
     }
 
     object Files {
         val EXTERNAL_CONTENT_URI: Uri = Uri.parse("content://media/external/file")
+    }
+
+    /** Alias used by some call sites (MediaStore.Media.COLUMN_*). */
+    object Media {
+        const val COLUMN_ID = MediaColumns._ID
+        const val COLUMN_DATA = MediaColumns.DATA
+        const val COLUMN_DISPLAY_NAME = MediaColumns.DISPLAY_NAME
+        const val COLUMN_SIZE = MediaColumns.SIZE
+        const val COLUMN_MIME_TYPE = MediaColumns.MIME_TYPE
     }
 
     object Downloads {

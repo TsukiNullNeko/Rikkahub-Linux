@@ -32,7 +32,7 @@ fun ZoomableAsyncImage(
     var showImageViewer by remember { mutableStateOf(false) }
     val context = LocalContext.current
     val export = LocalExportContext.current
-    val coilModel = ImageRequest.Builder(context)
+    val coilModel = ImageRequest.Builder(coil3.PlatformContext.INSTANCE)
         .data(model)
         .crossfade(false)
         .build()

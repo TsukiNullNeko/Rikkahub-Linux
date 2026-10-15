@@ -293,7 +293,10 @@ class AudioAttributes {
 }
 
 class AudioFocusRequest {
-    class Builder(attrs: AudioAttributes) {
+    class Builder {
+        constructor(attrs: AudioAttributes)
+        constructor(durationHint: Int)
+
         fun setWillPauseWhenDucked(pause: Boolean): Builder = this
         fun setAcceptsDelayedFocusGain(accept: Boolean): Builder = this
         fun setAudioAttributes(attrs: AudioAttributes): Builder = this
@@ -309,6 +312,9 @@ class AudioManager {
         const val AUDIOFOCUS_GAIN_TRANSIENT = 2
         const val AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK = 3
         const val AUDIOFOCUS_LOSS = -1
+        const val AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE = 4
+        const val AUDIOFOCUS_LOSS_TRANSIENT = -2
+        const val AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK = -3
         const val AUDIOFOCUS_REQUEST_GRANTED = 1
         const val AUDIOFOCUS_REQUEST_FAILED = 0
         const val STREAM_MUSIC = 3
@@ -344,7 +350,7 @@ class SoundPool {
     fun play(soundID: Int, leftVolume: Float, rightVolume: Float, priority: Int, loop: Int, rate: Float): Int = 0
     fun stop(streamID: Int) {}
     fun release() {}
-    fun setOnLoadCompleteListener(listener: Any?) {}
+    fun setOnLoadCompleteListener(listener: ((SoundPool, Int, Int) -> Unit)?) {}
 }
 
 class MediaMetadataRetriever : AutoCloseable {
@@ -391,3 +397,24 @@ class MediaMetadataRetriever : AutoCloseable {
 }
 
 class AudioRecordNotSupportedException(message: String) : RuntimeException(message)
+
+/** Desktop no-op: Linux file managers do not need media-scanner notifications. */
+class MediaScannerConnection {
+    interface MediaScannerConnectionClient {
+        fun onMediaScannerConnected()
+        fun onScanCompleted(path: String?, uri: android.net.Uri?)
+    }
+
+    companion object {
+        fun scanFile(
+            context: android.content.Context?,
+            paths: Array<String>,
+            mimeTypes: Array<String>?,
+            callback: ((String, android.net.Uri) -> Unit)?
+        ) {
+            paths.forEach { path ->
+                callback?.invoke(path, android.net.Uri.fromFile(java.io.File(path)))
+            }
+        }
+    }
+}

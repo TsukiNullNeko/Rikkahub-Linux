@@ -12,6 +12,9 @@ class PackageManager {
     class PackageInfo {
         var versionName: String? = "1.0"
         var versionCode: Long = 1
+        var lastUpdateTime: Long = System.currentTimeMillis()
+        var firstInstallTime: Long = System.currentTimeMillis()
+        var packageName: String = "me.rerere.rikkahub"
     }
 
     fun getPackageInfo(pkg: String, flags: Int): PackageInfo = PackageInfo()
@@ -35,6 +38,19 @@ class PackageManager {
     fun getInstalledApplications(flags: Int): List<ApplicationInfo> = emptyList()
 
     fun getInstalledPackages(flags: Int): List<PackageInfo> = emptyList()
+
+    fun getInstallerPackageName(packageName: String): String? = null
+
+    fun getInstallSourceInfo(packageName: String): InstallSourceInfo = InstallSourceInfo()
+
+    fun getLaunchIntentForPackage(pkg: String, flags: Int): android.content.Intent? = null
+}
+
+class InstallSourceInfo {
+    var initiatingPackageName: String? = null
+    var installingPackageName: String? = null
+    var originatingPackageName: String? = null
+    var packageSourceInfo: String? = null
 }
 
 class ResolveInfo {

@@ -24,8 +24,8 @@ sealed class QRResult {
 
 data class QRContent(val rawValue: String?)
 
-class ScanQRCode : ActivityResultContract<Unit, QRResult>() {
-    override fun execute(input: Unit, context: Context?): QRResult {
+class ScanQRCode : ActivityResultContract<Any?, QRResult>() {
+    override fun execute(input: Any?, context: Context?): QRResult {
         val uri = pickImage() ?: return QRResult.QRUserCanceled
         return decode(uri)
     }

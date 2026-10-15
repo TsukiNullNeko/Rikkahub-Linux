@@ -10,7 +10,7 @@ fun Modifier.heroAnimation(
     key: Any,
 ): Modifier {
     val sharedTransitionScope = LocalSharedTransitionScope.current
-    val animatedVisibilityScope = LocalNavAnimatedContentScope.current
+    val animatedVisibilityScope = LocalNavAnimatedContentScope.current ?: return this
     return with(sharedTransitionScope) {
         this@heroAnimation.sharedElement(
             sharedContentState = rememberSharedContentState(key),

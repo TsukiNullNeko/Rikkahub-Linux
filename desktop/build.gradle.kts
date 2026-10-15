@@ -1,4 +1,5 @@
 plugins {
+    application
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
@@ -12,10 +13,15 @@ kotlin {
         freeCompilerArgs.addAll(
             "-opt-in=androidx.compose.material3.ExperimentalMaterial3Api",
             "-opt-in=androidx.compose.material3.ExperimentalMaterial3ExpressiveApi",
+            "-opt-in=androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi",
+            "-opt-in=androidx.compose.material3.adaptive.layout.ExperimentalMaterial3AdaptiveApi",
             "-opt-in=androidx.compose.foundation.ExperimentalFoundationApi",
             "-opt-in=androidx.compose.foundation.layout.ExperimentalLayoutApi",
             "-opt-in=androidx.compose.animation.ExperimentalAnimationApi",
             "-opt-in=androidx.compose.ui.ExperimentalComposeUiApi",
+            "-opt-in=androidx.compose.ui.InternalComposeUiApi",
+            "-opt-in=androidx.compose.ui.text.InternalTextApi",
+            "-opt-in=androidx.compose.ui.node.InternalCoreApi",
             "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
             "-opt-in=kotlinx.serialization.ExperimentalSerializationApi",
             "-opt-in=kotlin.ExperimentalStdlibApi",
@@ -28,6 +34,23 @@ kotlin {
 ksp {
     arg("room.schemaLocation", "$projectDir/schemas")
     arg("room.generateKotlin", "true")
+}
+
+// Compose Multiplatform pulls org.jetbrains.androidx.lifecycle stub jars that shadow the real
+// androidx.lifecycle JVM implementations in the runtime classpath.
+configurations.configureEach {
+    exclude(group = "org.jetbrains.androidx.lifecycle")
+}
+
+application {
+    mainClass.set("me.rerere.rikkahub.MainKt")
+    applicationName = "rikkahub"
+    applicationDefaultJvmArgs = listOf(
+        "-Xmx2g",
+        "-Dfile.encoding=UTF-8",
+        "-Dawt.useSystemAAFontSettings=on",
+        "-Dswing.aatext=true"
+    )
 }
 
 java {
@@ -58,6 +81,7 @@ dependencies {
     implementation(compose.desktop.currentOs)
 
     implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.kotlinx.coroutines.swing)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.kotlinx.datetime)
     implementation(libs.okhttp)
@@ -80,6 +104,8 @@ dependencies {
     implementation(libs.lifecycle.runtime.compose)
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.paging)
+    implementation(libs.compose.material3.adaptive)
+    implementation(libs.compose.material3.adaptive.layout)
     implementation(libs.paging.common)
     implementation(libs.paging.compose)
     implementation(libs.androidx.datastore.preferences)
@@ -101,3 +127,10 @@ dependencies {
     implementation(libs.modelcontextprotocol.kotlin.sdk)
     ksp(libs.androidx.room.compiler)
 }
+
+// The classpath contains the same lifecycle jar twice (androidx + JetBrains publishing);
+// keep the first occurrence instead of failing the distribution copy.
+tasks.matching { it.name == "installDist" || it.name == "distZip" || it.name == "distTar" }
+    .configureEach {
+        (this as org.gradle.api.tasks.AbstractCopyTask).duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    }

@@ -11,11 +11,11 @@ class ClipItem(val uri: Uri?, val text: CharSequence?)
  * Desktop implementation of the content-transfer helper: reads the system clipboard
  * (file list first, then plain text) and stops once [block] accepts an item.
  */
-fun TransferableContent.consume(block: (ClipItem) -> Boolean) {
+fun TransferableContent.consume(block: (ClipItem) -> Boolean): TransferableContent? {
     val clipboard = try {
         Toolkit.getDefaultToolkit().systemClipboard
     } catch (e: Exception) {
-        return
+        return null
     }
 
     try {
@@ -24,7 +24,7 @@ fun TransferableContent.consume(block: (ClipItem) -> Boolean) {
             val files = clipboard.getData(DataFlavor.javaFileListFlavor) as? List<Any?> ?: emptyList()
             for (file in files) {
                 if (file is java.io.File) {
-                    if (block(ClipItem(Uri.fromFile(file), null))) return
+                    if (block(ClipItem(Uri.fromFile(file), null))) return this
                 }
             }
         }
@@ -35,9 +35,10 @@ fun TransferableContent.consume(block: (ClipItem) -> Boolean) {
         if (clipboard.isDataFlavorAvailable(DataFlavor.stringFlavor)) {
             val text = clipboard.getData(DataFlavor.stringFlavor) as? String
             if (text != null) {
-                block(ClipItem(null, text))
+                if (block(ClipItem(null, text))) return this
             }
         }
     } catch (_: Exception) {
     }
+    return null
 }

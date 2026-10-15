@@ -1,6 +1,6 @@
 package me.rerere.rikkahub.ui.pages.chat
 
-import androidx.activity.ComponentActivity
+import android.app.Activity
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
@@ -114,7 +114,7 @@ fun ChatDrawerContent(
     val isPlayStore = rememberIsPlayStoreVersion()
     val repo = koinInject<ConversationRepository>()
 
-    val activity = context as ComponentActivity
+    val activity = context as? Activity ?: Activity()
     val drawerVm: ChatDrawerVM = koinViewModel(viewModelStoreOwner = activity)
 
     val conversations = drawerVm.conversations.collectAsLazyPagingItems()

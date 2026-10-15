@@ -222,7 +222,7 @@ private fun MarkdownInlineScope.inlineMathWidgets(formula: String): List<Markdow
         } else {
             // 拆分失败时回退为单体内联渲染；连尺寸都量不出来说明公式有误，交给组件显示公式源码
             val bounds = assumeLatexSize(latex = formula, fontSize = fontSizePx)
-            if (bounds.isEmpty) return emptyList()
+            if (bounds.isEmpty()) return emptyList()
             listOf(
                 MarkdownInlineWidget(
                     placeholder = Placeholder(

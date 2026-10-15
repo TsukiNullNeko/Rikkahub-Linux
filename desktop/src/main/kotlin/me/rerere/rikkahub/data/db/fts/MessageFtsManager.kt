@@ -34,7 +34,7 @@ class MessageFtsManager(private val database: AppDatabase) {
     suspend fun indexConversation(conversation: Conversation) = withContext(Dispatchers.IO) {
         withConnection { connection ->
             connection.prepareStatement("DELETE FROM message_fts WHERE conversation_id = ?").use { statement ->
-                statement.setString(1, conversation.id)
+                statement.setString(1, conversation.id.toString())
                 statement.executeUpdate()
             }
             connection.prepareStatement(
@@ -50,7 +50,7 @@ class MessageFtsManager(private val database: AppDatabase) {
                     statement.setString(1, text)
                     statement.setString(2, node.id.toString())
                     statement.setString(3, node.currentMessage?.id?.toString() ?: node.id.toString())
-                    statement.setString(4, conversation.id)
+                    statement.setString(4, conversation.id.toString())
                     statement.setString(5, conversation.title)
                     statement.setLong(6, conversation.updateAt.toEpochMilli())
                     statement.executeUpdate()

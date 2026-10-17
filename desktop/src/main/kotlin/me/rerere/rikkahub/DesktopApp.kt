@@ -40,8 +40,8 @@ object BuildConfig {
     const val DEBUG = false
     const val APPLICATION_ID = "me.rerere.rikkahub"
     const val BUILD_TYPE = "release"
-    const val VERSION_NAME = "1.0.0-linux"
-    const val VERSION_CODE = 1
+    const val VERSION_NAME = "1.0.1-linux"
+    const val VERSION_CODE = 2
 }
 
 /**
